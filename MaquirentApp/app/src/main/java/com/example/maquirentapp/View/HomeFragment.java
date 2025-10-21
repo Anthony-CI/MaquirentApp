@@ -52,8 +52,11 @@ public class HomeFragment extends Fragment {
         cardNuevoAlquiler.setOnClickListener(v ->
                 navController.navigate(R.id.action_homeFragment_to_nuevoAlquilerFragment));
 
-//        cardCotizaciones.setOnClickListener(v ->
-//                navController.navigate(R.id.action_homeFragment_to_cotizacionesFragment));
+
+        cardCotizaciones.setOnClickListener(v ->
+                navController.navigate(R.id.action_home_to_tareasFragment));
+
+
 
         cardPlanosCambioVoltaje.setOnClickListener(v -> navController.navigate(R.id.action_home_to_PlanosCambioVoltajeFragment));
 
