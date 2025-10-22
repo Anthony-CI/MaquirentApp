@@ -1,5 +1,8 @@
 package com.example.maquirentapp.Model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Tarea {
     private String id;
     private String titulo;
@@ -11,6 +14,7 @@ public class Tarea {
     private String nombreCreador;
     private String completadaPor; // UID del usuario que la completó
     private String nombreCompletador;
+    private List<ResponsableAsignado> responsables = new ArrayList<>();
 
     public Tarea() {
     }
@@ -93,5 +97,20 @@ public class Tarea {
 
     public void setNombreCompletador(String nombreCompletador) {
         this.nombreCompletador = nombreCompletador;
+    }
+
+    public List<ResponsableAsignado> getResponsables() {
+        if (responsables == null) {
+            responsables = new ArrayList<>();
+        }
+        return responsables;
+    }
+
+    public void setResponsables(List<ResponsableAsignado> responsables) {
+        if (responsables == null) {
+            this.responsables = new ArrayList<>();
+        } else {
+            this.responsables = responsables;
+        }
     }
 }
