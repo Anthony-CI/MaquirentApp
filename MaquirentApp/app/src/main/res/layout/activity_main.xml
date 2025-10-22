@@ -104,7 +104,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/bottom_nav"
             app:layout_constraintStart_toStartOf="parent"
-            app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.MaterialComponents.FloatingActionButton"
+            app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Maquirent.Circle"
             app:tint="@null"
             app:maxImageSize="28dp"
             app:fabCustomSize="65dp"
