@@ -4,7 +4,14 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.maquirentapp.Model.ResponsableAsignado;
 import com.example.maquirentapp.Model.Tarea;
+import com.example.maquirentapp.Model.Usuario;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -12,14 +19,35 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Collections;
+
 public class TareasViewModel extends ViewModel {
 
     private static final String COLLECTION_TAREAS = "tareas";
+    private static final String COLLECTION_USUARIOS = "usuarios";
+
     private final MutableLiveData<List<Tarea>> tareas = new MutableLiveData<>(new ArrayList<>());
+    private final MutableLiveData<List<Usuario>> usuariosActivos = new MutableLiveData<>(new ArrayList<>());
+    private final FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+    private final FirebaseAuth auth = FirebaseAuth.getInstance();
+    private final FirebaseAuth.AuthStateListener authStateListener;
+    private ListenerRegistration listenerRegistration;
+    private ListenerRegistration listenerUsuarios;
+
+    public TareasViewModel() {
+        authStateListener = firebaseAuth -> {
+            FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+            iniciarEscucha(currentUser);
+            iniciarEscuchaUsuarios(currentUser);
+        };
+        auth.addAuthStateListener(authStateListener);
+        FirebaseUser currentUser = auth.getCurrentUser();
+        iniciarEscucha(currentUser);
+        iniciarEscuchaUsuarios(currentUser);
+    }
 
     private final FirebaseFirestore firestore = FirebaseFirestore.getInstance();
     private final FirebaseAuth auth = FirebaseAuth.getInstance();
@@ -36,6 +64,10 @@ public class TareasViewModel extends ViewModel {
         return tareas;
     }
 
+    public LiveData<List<Usuario>> obtenerUsuariosActivos() {
+        return usuariosActivos;
+    }
+
     public void agregarTarea(String titulo) {
         FirebaseUser currentUser = auth.getCurrentUser();
         if (currentUser == null) {
@@ -45,33 +77,45 @@ public class TareasViewModel extends ViewModel {
         Tarea nuevaTarea = new Tarea();
         nuevaTarea.setTitulo(titulo);
         nuevaTarea.setCompletada(false);
-
         nuevaTarea.setFechaCreacion(System.currentTimeMillis());
         nuevaTarea.setCreadoPor(currentUser.getUid());
         String nombreCreador = currentUser.getDisplayName() != null
                 ? currentUser.getDisplayName()
                 : currentUser.getEmail();
         nuevaTarea.setNombreCreador(nombreCreador);
+        nuevaTarea.setResponsables(new ArrayList<>());
 
         firestore.collection(COLLECTION_TAREAS)
                 .add(nuevaTarea);
     }
 
-    public void actualizarEstado(Tarea tarea, boolean completada) {
-
+    public void marcarTareaComoCompletada(Tarea tarea, List<Usuario> responsablesSeleccionados) {
         FirebaseUser currentUser = auth.getCurrentUser();
         if (currentUser == null || tarea.getId() == null) {
             return;
         }
 
         Map<String, Object> updates = new HashMap<>();
-        updates.put("completada", completada);
-        updates.put("fechaCompletada", completada ? System.currentTimeMillis() : 0L);
-        updates.put("completadaPor", completada ? currentUser.getUid() : null);
+        updates.put("completada", true);
+        updates.put("fechaCompletada", System.currentTimeMillis());
+        updates.put("completadaPor", currentUser.getUid());
         String nombreCompletador = currentUser.getDisplayName() != null
                 ? currentUser.getDisplayName()
                 : currentUser.getEmail();
-        updates.put("nombreCompletador", completada ? nombreCompletador : null);
+        updates.put("nombreCompletador", nombreCompletador);
+
+        List<ResponsableAsignado> responsablesAsignados = new ArrayList<>();
+        if (responsablesSeleccionados != null) {
+            for (Usuario usuario : responsablesSeleccionados) {
+                ResponsableAsignado responsable = new ResponsableAsignado(
+                        usuario.getUid(),
+                        usuario.getNombre(),
+                        usuario.getFotoUrl()
+                );
+                responsablesAsignados.add(responsable);
+            }
+        }
+        updates.put("responsables", responsablesAsignados);
 
         firestore.collection(COLLECTION_TAREAS)
                 .document(tarea.getId())
@@ -90,7 +134,6 @@ public class TareasViewModel extends ViewModel {
         }
 
         listenerRegistration = firestore.collection(COLLECTION_TAREAS)
-                .whereEqualTo("creadoPor", currentUser.getUid())
                 .addSnapshotListener((value, error) -> {
                     if (error != null || value == null) {
                         return;
@@ -101,6 +144,7 @@ public class TareasViewModel extends ViewModel {
                         Tarea tarea = document.toObject(Tarea.class);
                         if (tarea != null) {
                             tarea.setId(document.getId());
+                            tarea.setResponsables(tarea.getResponsables());
                             listaTareas.add(tarea);
                         }
                     }
@@ -109,10 +153,43 @@ public class TareasViewModel extends ViewModel {
                 });
     }
 
+    private void iniciarEscuchaUsuarios(FirebaseUser currentUser) {
+        if (listenerUsuarios != null) {
+            listenerUsuarios.remove();
+            listenerUsuarios = null;
+        }
+
+        if (currentUser == null) {
+            usuariosActivos.setValue(new ArrayList<>());
+            return;
+        }
+
+        listenerUsuarios = firestore.collection(COLLECTION_USUARIOS)
+                .whereEqualTo("estado", "activo")
+                .addSnapshotListener((value, error) -> {
+                    if (error != null || value == null) {
+                        return;
+                    }
+
+                    List<Usuario> listaUsuarios = new ArrayList<>();
+                    for (DocumentSnapshot document : value.getDocuments()) {
+                        Usuario usuario = document.toObject(Usuario.class);
+                        if (usuario != null) {
+                            usuario.setUid(document.getId());
+                            listaUsuarios.add(usuario);
+                        }
+                    }
+                    usuariosActivos.setValue(listaUsuarios);
+                });
+    }
+
     @Override
     protected void onCleared() {
         if (listenerRegistration != null) {
             listenerRegistration.remove();
+        }
+        if (listenerUsuarios != null) {
+            listenerUsuarios.remove();
         }
         auth.removeAuthStateListener(authStateListener);
         super.onCleared();
