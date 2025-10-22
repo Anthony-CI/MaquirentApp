@@ -127,7 +127,8 @@ public class TareasFragment extends Fragment {
         textNombreTarea.setText(tarea.getTitulo());
         textTituloSeleccion.setText(getString(R.string.texto_seleccione_responsable));
 
-        SeleccionResponsablesAdapter adapter = new SeleccionResponsablesAdapter(() -> {
+        SeleccionResponsablesAdapter adapter = new SeleccionResponsablesAdapter();
+        adapter.setOnSeleccionChangeListener(() -> {
             List<Usuario> seleccionados = adapter.obtenerSeleccionados();
             botonMarcarCompletada.setEnabled(!seleccionados.isEmpty());
         });

@@ -28,9 +28,16 @@ public class SeleccionResponsablesAdapter extends RecyclerView.Adapter<Seleccion
 
     private final List<Usuario> usuarios = new ArrayList<>();
     private final Set<String> seleccionadosIds = new HashSet<>();
-    private final OnSeleccionChangeListener listener;
+    private OnSeleccionChangeListener listener;
+
+    public SeleccionResponsablesAdapter() {
+    }
 
     public SeleccionResponsablesAdapter(OnSeleccionChangeListener listener) {
+        this.listener = listener;
+    }
+
+    public void setOnSeleccionChangeListener(OnSeleccionChangeListener listener) {
         this.listener = listener;
     }
 
