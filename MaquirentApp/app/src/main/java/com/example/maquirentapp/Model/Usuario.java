@@ -9,6 +9,7 @@ public class Usuario {
     private long fechaCreacion;
     private long fechaUltimaActividad;
     private String creadoPor; // UID del admin que aprobó
+    private String fotoUrl;
 
     public Usuario() {
     }
@@ -84,5 +85,13 @@ public class Usuario {
 
     public void setCreadoPor(String creadoPor) {
         this.creadoPor = creadoPor;
+    }
+
+    public String getFotoUrl() {
+        return fotoUrl;
+    }
+
+    public void setFotoUrl(String fotoUrl) {
+        this.fotoUrl = fotoUrl;
     }
 }
