@@ -1,7 +1,7 @@
 package com.example.maquirentapp.Model;
 
 import com.google.firebase.Timestamp;
-import com.google.firebase.firestore.Exclude;
+import com.google.firebase.firestore.PropertyName;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -63,13 +63,13 @@ public class Tarea {
         this.fechaCreacion = fechaCreacion;
     }
 
-    @Exclude
-    public void setFechaCreacion(Long fechaCreacion) {
+    @PropertyName("fechaCreacion")
+    public void setFechaCreacionFromLong(Long fechaCreacion) {
         this.fechaCreacion = fechaCreacion != null ? new Date(fechaCreacion) : null;
     }
 
-    @Exclude
-    public void setFechaCreacion(Timestamp fechaCreacion) {
+    @PropertyName("fechaCreacion")
+    public void setFechaCreacionFromTimestamp(Timestamp fechaCreacion) {
         this.fechaCreacion = fechaCreacion != null ? fechaCreacion.toDate() : null;
     }
 
@@ -81,13 +81,13 @@ public class Tarea {
         this.fechaCompletada = fechaCompletada;
     }
 
-    @Exclude
-    public void setFechaCompletada(Long fechaCompletada) {
+    @PropertyName("fechaCompletada")
+    public void setFechaCompletadaFromLong(Long fechaCompletada) {
         this.fechaCompletada = fechaCompletada != null ? new Date(fechaCompletada) : null;
     }
 
-    @Exclude
-    public void setFechaCompletada(Timestamp fechaCompletada) {
+    @PropertyName("fechaCompletada")
+    public void setFechaCompletadaFromTimestamp(Timestamp fechaCompletada) {
         this.fechaCompletada = fechaCompletada != null ? fechaCompletada.toDate() : null;
     }
 
