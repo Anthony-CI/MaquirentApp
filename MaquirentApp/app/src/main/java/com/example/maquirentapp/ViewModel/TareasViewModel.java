@@ -137,18 +137,18 @@ public class TareasViewModel extends ViewModel {
                             Object fechaCreacionRaw = document.get("fechaCreacion");
                             if (tarea.getFechaCreacion() == null) {
                                 if (fechaCreacionRaw instanceof Timestamp) {
-                                    tarea.setFechaCreacion((Timestamp) fechaCreacionRaw);
+                                    tarea.setFechaCreacionFromTimestamp((Timestamp) fechaCreacionRaw);
                                 } else if (fechaCreacionRaw instanceof Long) {
-                                    tarea.setFechaCreacion((Long) fechaCreacionRaw);
+                                    tarea.setFechaCreacionFromLong((Long) fechaCreacionRaw);
                                 }
                             }
 
                             Object fechaCompletadaRaw = document.get("fechaCompletada");
                             if (tarea.getFechaCompletada() == null) {
                                 if (fechaCompletadaRaw instanceof Timestamp) {
-                                    tarea.setFechaCompletada((Timestamp) fechaCompletadaRaw);
+                                    tarea.setFechaCompletadaFromTimestamp((Timestamp) fechaCompletadaRaw);
                                 } else if (fechaCompletadaRaw instanceof Long) {
-                                    tarea.setFechaCompletada((Long) fechaCompletadaRaw);
+                                    tarea.setFechaCompletadaFromLong((Long) fechaCompletadaRaw);
                                 }
                             }
 
