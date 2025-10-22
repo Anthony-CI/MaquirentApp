@@ -13,12 +13,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
-
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.ListenerRegistration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -135,21 +129,13 @@ public class TareasViewModel extends ViewModel {
                         Tarea tarea = document.toObject(Tarea.class);
                         if (tarea != null) {
                             Object fechaCreacionRaw = document.get("fechaCreacion");
-                            if (tarea.getFechaCreacion() == null) {
-                                if (fechaCreacionRaw instanceof Timestamp) {
-                                    tarea.setFechaCreacionFromTimestamp((Timestamp) fechaCreacionRaw);
-                                } else if (fechaCreacionRaw instanceof Long) {
-                                    tarea.setFechaCreacionFromLong((Long) fechaCreacionRaw);
-                                }
+                            if (tarea.getFechaCreacion() == null && fechaCreacionRaw != null) {
+                                tarea.setFechaCreacionRaw(fechaCreacionRaw);
                             }
 
                             Object fechaCompletadaRaw = document.get("fechaCompletada");
-                            if (tarea.getFechaCompletada() == null) {
-                                if (fechaCompletadaRaw instanceof Timestamp) {
-                                    tarea.setFechaCompletadaFromTimestamp((Timestamp) fechaCompletadaRaw);
-                                } else if (fechaCompletadaRaw instanceof Long) {
-                                    tarea.setFechaCompletadaFromLong((Long) fechaCompletadaRaw);
-                                }
+                            if (tarea.getFechaCompletada() == null && fechaCompletadaRaw != null) {
+                                tarea.setFechaCompletadaRaw(fechaCompletadaRaw);
                             }
 
                             tarea.setId(document.getId());

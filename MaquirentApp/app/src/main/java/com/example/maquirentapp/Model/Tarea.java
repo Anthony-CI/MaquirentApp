@@ -1,6 +1,7 @@
 package com.example.maquirentapp.Model;
 
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.Exclude;
 import com.google.firebase.firestore.PropertyName;
 
 import java.util.ArrayList;
@@ -59,36 +60,28 @@ public class Tarea {
         return fechaCreacion;
     }
 
+    @Exclude
     public void setFechaCreacion(Date fechaCreacion) {
         this.fechaCreacion = fechaCreacion;
     }
 
     @PropertyName("fechaCreacion")
-    public void setFechaCreacionFromLong(Long fechaCreacion) {
-        this.fechaCreacion = fechaCreacion != null ? new Date(fechaCreacion) : null;
-    }
-
-    @PropertyName("fechaCreacion")
-    public void setFechaCreacionFromTimestamp(Timestamp fechaCreacion) {
-        this.fechaCreacion = fechaCreacion != null ? fechaCreacion.toDate() : null;
+    public void setFechaCreacionRaw(Object fechaCreacion) {
+        this.fechaCreacion = convertToDate(fechaCreacion);
     }
 
     public Date getFechaCompletada() {
         return fechaCompletada;
     }
 
+    @Exclude
     public void setFechaCompletada(Date fechaCompletada) {
         this.fechaCompletada = fechaCompletada;
     }
 
     @PropertyName("fechaCompletada")
-    public void setFechaCompletadaFromLong(Long fechaCompletada) {
-        this.fechaCompletada = fechaCompletada != null ? new Date(fechaCompletada) : null;
-    }
-
-    @PropertyName("fechaCompletada")
-    public void setFechaCompletadaFromTimestamp(Timestamp fechaCompletada) {
-        this.fechaCompletada = fechaCompletada != null ? fechaCompletada.toDate() : null;
+    public void setFechaCompletadaRaw(Object fechaCompletada) {
+        this.fechaCompletada = convertToDate(fechaCompletada);
     }
 
     public long getFechaCreacionEpoch() {
@@ -144,5 +137,18 @@ public class Tarea {
         } else {
             this.responsables = responsables;
         }
+    }
+
+    private Date convertToDate(Object value) {
+        if (value instanceof Date) {
+            return (Date) value;
+        }
+        if (value instanceof Timestamp) {
+            return ((Timestamp) value).toDate();
+        }
+        if (value instanceof Long) {
+            return new Date((Long) value);
+        }
+        return null;
     }
 }
