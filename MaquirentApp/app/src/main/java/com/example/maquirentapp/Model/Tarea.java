@@ -1,6 +1,8 @@
 package com.example.maquirentapp.Model;
 
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.Exclude;
+import com.google.firebase.firestore.PropertyName;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -58,32 +60,28 @@ public class Tarea {
         return fechaCreacion;
     }
 
+    @Exclude
     public void setFechaCreacion(Date fechaCreacion) {
         this.fechaCreacion = fechaCreacion;
     }
 
-    public void setFechaCreacion(Long fechaCreacion) {
-        this.fechaCreacion = fechaCreacion != null ? new Date(fechaCreacion) : null;
-    }
-
-    public void setFechaCreacion(Timestamp fechaCreacion) {
-        this.fechaCreacion = fechaCreacion != null ? fechaCreacion.toDate() : null;
+    @PropertyName("fechaCreacion")
+    public void setFechaCreacionRaw(Object fechaCreacion) {
+        this.fechaCreacion = convertToDate(fechaCreacion);
     }
 
     public Date getFechaCompletada() {
         return fechaCompletada;
     }
 
+    @Exclude
     public void setFechaCompletada(Date fechaCompletada) {
         this.fechaCompletada = fechaCompletada;
     }
 
-    public void setFechaCompletada(Long fechaCompletada) {
-        this.fechaCompletada = fechaCompletada != null ? new Date(fechaCompletada) : null;
-    }
-
-    public void setFechaCompletada(Timestamp fechaCompletada) {
-        this.fechaCompletada = fechaCompletada != null ? fechaCompletada.toDate() : null;
+    @PropertyName("fechaCompletada")
+    public void setFechaCompletadaRaw(Object fechaCompletada) {
+        this.fechaCompletada = convertToDate(fechaCompletada);
     }
 
     public long getFechaCreacionEpoch() {
@@ -139,5 +137,18 @@ public class Tarea {
         } else {
             this.responsables = responsables;
         }
+    }
+
+    private Date convertToDate(Object value) {
+        if (value instanceof Date) {
+            return (Date) value;
+        }
+        if (value instanceof Timestamp) {
+            return ((Timestamp) value).toDate();
+        }
+        if (value instanceof Long) {
+            return new Date((Long) value);
+        }
+        return null;
     }
 }
