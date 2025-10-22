@@ -22,7 +22,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:scaleType="centerCrop"
-            app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Maquirent.Circle"
+            app:shapeAppearanceOverlay="@style/MaquirentShapeAppearanceOverlay.Circle"
             android:contentDescription="@string/descripcion_imagen_responsable" />
 
         <TextView
