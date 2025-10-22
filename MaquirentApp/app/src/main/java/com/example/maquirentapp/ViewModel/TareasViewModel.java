@@ -13,6 +13,11 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -42,6 +47,17 @@ public class TareasViewModel extends ViewModel {
         FirebaseUser currentUser = auth.getCurrentUser();
         iniciarEscucha(currentUser);
         iniciarEscuchaUsuarios(currentUser);
+    }
+
+    private final FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+    private final FirebaseAuth auth = FirebaseAuth.getInstance();
+    private final FirebaseAuth.AuthStateListener authStateListener;
+    private ListenerRegistration listenerRegistration;
+
+    public TareasViewModel() {
+        authStateListener = firebaseAuth -> iniciarEscucha(firebaseAuth.getCurrentUser());
+        auth.addAuthStateListener(authStateListener);
+        iniciarEscucha(auth.getCurrentUser());
     }
 
     public LiveData<List<Tarea>> obtenerTareas() {
