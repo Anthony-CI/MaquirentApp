@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel;
 import com.example.maquirentapp.Model.ResponsableAsignado;
 import com.example.maquirentapp.Model.Tarea;
 import com.example.maquirentapp.Model.Usuario;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -20,6 +21,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +68,7 @@ public class TareasViewModel extends ViewModel {
         Tarea nuevaTarea = new Tarea();
         nuevaTarea.setTitulo(titulo);
         nuevaTarea.setCompletada(false);
-        nuevaTarea.setFechaCreacion(System.currentTimeMillis());
+        nuevaTarea.setFechaCreacion(new Date());
         nuevaTarea.setCreadoPor(currentUser.getUid());
         String nombreCreador = currentUser.getDisplayName() != null
                 ? currentUser.getDisplayName()
@@ -86,7 +88,7 @@ public class TareasViewModel extends ViewModel {
 
         Map<String, Object> updates = new HashMap<>();
         updates.put("completada", true);
-        updates.put("fechaCompletada", System.currentTimeMillis());
+        updates.put("fechaCompletada", new Date());
         updates.put("completadaPor", currentUser.getUid());
         String nombreCompletador = currentUser.getDisplayName() != null
                 ? currentUser.getDisplayName()
@@ -132,12 +134,36 @@ public class TareasViewModel extends ViewModel {
                     for (DocumentSnapshot document : value.getDocuments()) {
                         Tarea tarea = document.toObject(Tarea.class);
                         if (tarea != null) {
+                            Object fechaCreacionRaw = document.get("fechaCreacion");
+                            if (tarea.getFechaCreacion() == null) {
+                                if (fechaCreacionRaw instanceof Timestamp) {
+                                    tarea.setFechaCreacion((Timestamp) fechaCreacionRaw);
+                                } else if (fechaCreacionRaw instanceof Long) {
+                                    tarea.setFechaCreacion((Long) fechaCreacionRaw);
+                                }
+                            }
+
+                            Object fechaCompletadaRaw = document.get("fechaCompletada");
+                            if (tarea.getFechaCompletada() == null) {
+                                if (fechaCompletadaRaw instanceof Timestamp) {
+                                    tarea.setFechaCompletada((Timestamp) fechaCompletadaRaw);
+                                } else if (fechaCompletadaRaw instanceof Long) {
+                                    tarea.setFechaCompletada((Long) fechaCompletadaRaw);
+                                }
+                            }
+
                             tarea.setId(document.getId());
                             tarea.setResponsables(tarea.getResponsables());
                             listaTareas.add(tarea);
                         }
                     }
-                    Collections.sort(listaTareas, (t1, t2) -> Long.compare(t2.getFechaCreacion(), t1.getFechaCreacion()));
+                    Collections.sort(listaTareas, (t1, t2) -> {
+                        Date fecha2 = t2.getFechaCreacion();
+                        Date fecha1 = t1.getFechaCreacion();
+                        long tiempo2 = fecha2 != null ? fecha2.getTime() : 0L;
+                        long tiempo1 = fecha1 != null ? fecha1.getTime() : 0L;
+                        return Long.compare(tiempo2, tiempo1);
+                    });
                     tareas.setValue(listaTareas);
                 });
     }

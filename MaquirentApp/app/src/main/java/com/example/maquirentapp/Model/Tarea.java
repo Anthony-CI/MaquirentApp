@@ -1,6 +1,9 @@
 package com.example.maquirentapp.Model;
 
+import com.google.firebase.Timestamp;
+
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Tarea {
@@ -8,8 +11,8 @@ public class Tarea {
     private String titulo;
     private String descripcion;
     private boolean completada;
-    private long fechaCreacion;
-    private long fechaCompletada;
+    private Date fechaCreacion;
+    private Date fechaCompletada;
     private String creadoPor; // UID del usuario
     private String nombreCreador;
     private String completadaPor; // UID del usuario que la completó
@@ -51,20 +54,44 @@ public class Tarea {
         this.completada = completada;
     }
 
-    public long getFechaCreacion() {
+    public Date getFechaCreacion() {
         return fechaCreacion;
     }
 
-    public void setFechaCreacion(long fechaCreacion) {
+    public void setFechaCreacion(Date fechaCreacion) {
         this.fechaCreacion = fechaCreacion;
     }
 
-    public long getFechaCompletada() {
+    public void setFechaCreacion(Long fechaCreacion) {
+        this.fechaCreacion = fechaCreacion != null ? new Date(fechaCreacion) : null;
+    }
+
+    public void setFechaCreacion(Timestamp fechaCreacion) {
+        this.fechaCreacion = fechaCreacion != null ? fechaCreacion.toDate() : null;
+    }
+
+    public Date getFechaCompletada() {
         return fechaCompletada;
     }
 
-    public void setFechaCompletada(long fechaCompletada) {
+    public void setFechaCompletada(Date fechaCompletada) {
         this.fechaCompletada = fechaCompletada;
+    }
+
+    public void setFechaCompletada(Long fechaCompletada) {
+        this.fechaCompletada = fechaCompletada != null ? new Date(fechaCompletada) : null;
+    }
+
+    public void setFechaCompletada(Timestamp fechaCompletada) {
+        this.fechaCompletada = fechaCompletada != null ? fechaCompletada.toDate() : null;
+    }
+
+    public long getFechaCreacionEpoch() {
+        return fechaCreacion != null ? fechaCreacion.getTime() : 0L;
+    }
+
+    public long getFechaCompletadaEpoch() {
+        return fechaCompletada != null ? fechaCompletada.getTime() : 0L;
     }
 
     public String getCreadoPor() {
